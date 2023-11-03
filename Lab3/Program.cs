@@ -12,7 +12,7 @@ public class MainWindow : GameWindow
     private float angleY = 0.0f;
     private ColorRandomizer colorRandomizer = new ColorRandomizer();
     private Color4[] colors = new Color4[3];
-    public MainWindow(int width, int height) : base(width, height) 
+    public MainWindow(int width, int height) : base(width, height)
     {
 
         for (int i = 0; i < 3; i++)
