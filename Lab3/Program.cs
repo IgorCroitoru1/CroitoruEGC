@@ -5,19 +5,21 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System.Drawing;
+using System.IO;
 
 public class MainWindow : GameWindow
 {
     private float angleX = 0.0f;
     private float angleY = 0.0f;
     private ColorRandomizer colorRandomizer = new ColorRandomizer();
-    private Color4[] colors = new Color4[3];
+    private Color4[] vertexColors = new Color4[3];
+    float[] triangleVertices = new float[9]; // Trei coordonate pentru fiecare vârf al triunghiului
     public MainWindow(int width, int height) : base(width, height)
     {
 
         for (int i = 0; i < 3; i++)
         {
-            colors[i] = colorRandomizer.GetRandomColor();
+            vertexColors[i] = colorRandomizer.GetRandomColor();
         }
 
     }
@@ -34,17 +36,40 @@ public class MainWindow : GameWindow
         //Generez un set nou de culori
         if (keyboard[Key.R])
         {
-            for (int i = 0; i < 3; i++)
-            {
-                colors[i] = colorRandomizer.GetRandomColor();
-            }
+            // Amplificarea canalului roșu
+            vertexColors[0].R *= 2.0f;
+            vertexColors[1].R *= 2.0f;
+            vertexColors[2].R *= 2.0f;
+        }
+        else if (keyboard[Key.G])
+        {
+            // Amplificarea canalului verde
+            vertexColors[0].G *= 2.0f;
+            vertexColors[1].G *= 2.0f;
+            vertexColors[2].G *= 2.0f;
+        }
+        else if (keyboard[Key.B])
+        {
+            // Amplificarea canalului albastru
+            vertexColors[0].B *= 2.0f;
+            vertexColors[1].B *= 2.0f;
+            vertexColors[2].B *= 2.0f;
+        }
+
+        else if (keyboard[Key.X])
+        {
+
+            // Afișarea valorilor RGB în consolă
+            Console.WriteLine($"Vertex 0 - R: {vertexColors[0].R}, G: {vertexColors[0].G}, B: {vertexColors[0].B}");
+            Console.WriteLine($"Vertex 1 - R: {vertexColors[1].R}, G: {vertexColors[1].G}, B: {vertexColors[1].B}");
+            Console.WriteLine($"Vertex 2 - R: {vertexColors[2].R}, G: {vertexColors[2].G}, B: {vertexColors[2].B}");
         }
         //Printez culorile
         if (mouse[MouseButton.Right])
         {
-            for (int i=0;i< colors.Length;i++)
+            for (int i=0;i< vertexColors.Length;i++)
             {
-                Console.WriteLine($"Color {i}: R={colors[i].R}, G={colors[i].G}, B={colors[i].B}");
+                Console.WriteLine($"Color {i}: R={vertexColors[i].R}, G={vertexColors[i].G}, B={vertexColors[i].B}");
                
 
             }
@@ -68,13 +93,27 @@ public class MainWindow : GameWindow
         GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GL.Ortho(0, Width, Height, 0, -1, 1);
 
+        // Citirea coordonatelor triunghiului din fișier
+        string[] lines = File.ReadAllLines("C:\\Users\\Igor\\source\\repos\\LaboratoareEGC\\Lab3\\coord.txt");
 
-        // Activăm gestionarea evenimentelor mouse-ului
-        MouseMove += (sender, args) =>
+        if (lines.Length >= 3)
         {
-            angleX += args.XDelta * 0.01f;
-            angleY += args.YDelta * 0.01f;
-        };
+
+            for (int i = 0; i < 3; i++)
+            {
+                string[] coords = lines[i].Split(' ');
+                for (int j = 0; j < 2; j++) // Citim doar două coordonate (x și y)
+                {
+                    triangleVertices[i * 2 + j] = float.Parse(coords[j]);
+                }
+            }
+
+        }
+        else
+        {
+            Console.WriteLine("Nu s-au găsit suficiente coordonate pentru a desena un triunghi.");
+        }
+
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -87,12 +126,15 @@ public class MainWindow : GameWindow
       
 
         GL.Begin(PrimitiveType.TriangleFan);
-        GL.Color4(colors[0]);
-        GL.Vertex2(200, 200);
-        GL.Color4(colors[1]);
-        GL.Vertex2(300, 100);
-        GL.Color4(colors[2]);
-        GL.Vertex2(400, 200);
+        GL.Color4(vertexColors[0]);
+        GL.Vertex2(triangleVertices[0], triangleVertices[1]);
+
+        GL.Color4(vertexColors[1]);
+        GL.Vertex2(triangleVertices[2], triangleVertices[3]);
+
+        GL.Color4(vertexColors[2]);
+        GL.Vertex2(triangleVertices[4], triangleVertices[5]);
+
         GL.End();
 
         SwapBuffers();
