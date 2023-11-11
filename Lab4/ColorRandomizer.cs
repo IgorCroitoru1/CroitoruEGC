@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 using OpenTK.Graphics;
 
@@ -16,6 +17,6 @@ public class ColorRandomizer
         float r = (float)random.NextDouble();
         float g = (float)random.NextDouble();
         float b = (float)random.NextDouble();
-        return new Color4(r, g, b,1.0f);
+        return new Color4(r, g, b, 1.0f);
     }
 }
