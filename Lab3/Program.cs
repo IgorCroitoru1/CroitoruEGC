@@ -13,8 +13,19 @@ public class MainWindow : GameWindow
     private float angleY = 0.0f;
     private ColorRandomizer colorRandomizer = new ColorRandomizer();
     private Color4[] vertexColors = new Color4[3];
+    private Color4 culoareTriunghi = Color4.White;
+    private Color4 culoareBack = Color4.Red;
+
+    private int lineX_1 = 35;
+    private int lineY_1 = 25;
+    private int lineZ_1 = 20;
+    private int lineX_2 = 70;
+    private int lineY_2 = 25;
+    private int lineZ_2 = 40;
+
+
     float[] triangleVertices = new float[9]; // Trei coordonate pentru fiecare vârf al triunghiului
-    public MainWindow(int width, int height) : base(width, height)
+    public MainWindow(int width, int height) : base(1152, 600)
     {
 
         for (int i = 0; i < 3; i++)
@@ -32,6 +43,27 @@ public class MainWindow : GameWindow
 
         KeyboardState keyboard = Keyboard.GetState();
         MouseState mouse = Mouse.GetState();
+
+        if (keyboard[Key.W])
+        {
+            triangleVertices[1]++;
+            triangleVertices[3]++;
+            triangleVertices[5]++;
+
+        }
+        if (keyboard[Key.S])
+        {
+            triangleVertices[1]--;
+            triangleVertices[3]--;
+            triangleVertices[5]--;
+
+        }
+
+        if (keyboard[Key.H])
+        {
+            culoareBack = colorRandomizer.GetRandomColor();
+        }
+
 
         //Generez un set nou de culori
         if (keyboard[Key.R])
@@ -90,7 +122,7 @@ public class MainWindow : GameWindow
     protected override void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
-        GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        GL.ClearColor(culoareBack);
         GL.Ortho(0, Width, Height, 0, -1, 1);
 
         // Citirea coordonatelor triunghiului din fișier
@@ -116,26 +148,59 @@ public class MainWindow : GameWindow
 
     }
 
-    protected override void OnRenderFrame(FrameEventArgs e)
+    private void DrawLine()
     {
-        base.OnRenderFrame(e);
-        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        GL.Begin(PrimitiveType.Lines);
+        GL.Color3(Color.Blue);
+        GL.Vertex3(lineX_1, lineY_1, lineZ_1);
+        GL.Vertex3(lineX_2, lineY_2, lineZ_2);
+        GL.End();
+    }
 
-        GL.PointSize(5f);
-
-      
-
+    private void Triangle()
+    {
         GL.Begin(PrimitiveType.TriangleFan);
         GL.Color4(vertexColors[0]);
         GL.Vertex2(triangleVertices[0], triangleVertices[1]);
 
-        GL.Color4(vertexColors[1]);
+        // GL.Color4(vertexColors[1]);
         GL.Vertex2(triangleVertices[2], triangleVertices[3]);
 
-        GL.Color4(vertexColors[2]);
+        // GL.Color4(vertexColors[2]);
         GL.Vertex2(triangleVertices[4], triangleVertices[5]);
 
         GL.End();
+    }
+
+    private void Triangle1()
+    {
+        GL.Begin(PrimitiveType.TriangleFan);
+        GL.Color4(Color.Blue);
+        GL.Vertex2(triangleVertices[0], triangleVertices[1]);
+
+        // GL.Color4(vertexColors[1]);
+        GL.Vertex2(triangleVertices[2]+100, triangleVertices[3]+130);
+
+        // GL.Color4(vertexColors[2]);
+        GL.Vertex2(triangleVertices[4], triangleVertices[5]);
+
+        GL.End();
+    }
+
+
+
+    protected override void OnRenderFrame(FrameEventArgs e)
+    {
+        base.OnRenderFrame(e);
+        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        GL.ClearColor(culoareBack);
+
+        GL.PointSize(5f);
+
+
+        DrawLine();
+        Triangle();
+        Triangle1();
 
         SwapBuffers();
     }

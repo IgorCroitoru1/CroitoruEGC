@@ -6,13 +6,14 @@ using OpenTK.Input;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lab4
+namespace Lab9
 {
-    internal class Program: GameWindow
+    internal class Program : GameWindow
     {
         private Color[] colorVertices = { Color.White, Color.LawnGreen, Color.WhiteSmoke, Color.Tomato, Color.Turquoise, Color.OldLace, Color.Olive, Color.MidnightBlue, Color.PowderBlue, Color.PeachPuff, Color.LavenderBlush, Color.MediumAquamarine };
         private const int XYZ_SIZE = 75;
@@ -24,29 +25,27 @@ namespace Lab4
         private float minBlue = 0.0f;
         private float maxBlue = 1.0f;
         private Cube cube;
+        private Pyramid pyramid;
+
 
         private ColorRandomizer randomizer;
 
         private int[] triangle_1 = { 35, 25, 20 };
         private int[] triangle_2 = { 70, 25, 40 };
         private int[] triangle_3 = { 30, 60, 50 };
-
-
+        private float lightIntensity = 1.0f;
+        private int[] textures = new int[2];
         public Program(int width, int height) : base(width, height)
         {
+            pyramid = new Pyramid(10);
             cube = new Cube(10);
         }
 
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
+      
+        //Desenează cubul - triunghuri.
 
-            GL.Enable(EnableCap.DepthTest);
-            GL.DepthFunc(DepthFunction.Less);
 
-            GL.Hint(HintTarget.PolygonSmoothHint, HintMode.Nicest);
-        }
-
+       
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
@@ -64,8 +63,47 @@ namespace Lab4
             GL.LoadMatrix(ref lookat);
 
             // showCube = true;
+
         }
 
+        private void SetupLight()
+        {
+            GL.Enable(EnableCap.Light0);
+
+            float[] lightPosition = { 10.0f, 10.0f, 10.0f, 1.0f };
+            GL.Light(LightName.Light0, LightParameter.Position, lightPosition);
+        }
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            GL.Enable(EnableCap.DepthTest);
+            GL.DepthFunc(DepthFunction.Less);
+          
+            SetupLight();
+            // Enable lighting
+            GL.Enable(EnableCap.Lighting);
+            GL.Enable(EnableCap.Light0);
+
+            // Set light properties
+            float[] lightPosition = { 50.0f, 50.0f, 50.0f, 1.0f };
+            GL.Light(LightName.Light0, LightParameter.Position, lightPosition);
+            GL.Light(LightName.Light0, LightParameter.Ambient, new float[] { 0.4f, 0.4f, 0.4f, 1.0f });
+
+            GL.Light(LightName.Light0, LightParameter.Diffuse, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+            GL.Light(LightName.Light0, LightParameter.Specular, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+            GL.Light(LightName.Light0, LightParameter.Specular, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+
+
+            // Set material properties
+            GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Ambient, new float[] { 0.2f, 0.2f, 0.2f, 1.0f });
+            GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Diffuse, new float[] { 0.8f, 0.8f, 0.8f, 1.0f });
+            GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Specular, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+            GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Shininess, 100.0f);
+
+
+
+        }
+     
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
@@ -73,26 +111,30 @@ namespace Lab4
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-
             DrawAxes();
-            DrawTriangle();
-            cube.Draw();
-
-
-           SwapBuffers();
+            //cube.Draw();
+            pyramid.Draw();
+            SwapBuffers();
         }
-
-
+      
+      
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
             cube.KeyBinds();
-            
+            KeyboardState keyboard = Keyboard.GetState();
+
+            // Increase light intensity when 'L' is pressed
+            if (keyboard[Key.L])
+            {
+                lightIntensity += 0.1f; // You can adjust the step as needed
+                GL.Light(LightName.Light0, LightParameter.Diffuse, new float[] { lightIntensity, lightIntensity, lightIntensity, 1.0f });
+            }
         }
 
 
 
-            private void DrawAxes()
+        private void DrawAxes()
         {
             // Desenează axa Ox (cu roșu).
             GL.Begin(PrimitiveType.Lines);
@@ -127,13 +169,13 @@ namespace Lab4
             GL.End();
         }
 
-      
+
 
 
 
         static void Main(string[] args)
         {
-            using (Program example = new Program(800,600))
+            using (Program example = new Program(800, 600))
             {
                 example.Run(30.0, 0.0);
             }

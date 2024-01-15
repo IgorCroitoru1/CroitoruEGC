@@ -2,12 +2,12 @@
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
-using Lab4;
+using Lab9;
 using System.Drawing;
 using OpenTK.Input;
 using OpenTK.Graphics;
 
-namespace Lab4
+namespace Lab9
 {
     class Cube
     {
@@ -15,8 +15,8 @@ namespace Lab4
         ColorRandomizer randomColor = new ColorRandomizer();
 
         // Matricea de culori pentru fețele cubului
-        Color[] faceColors = new Color[6];
-        Color4 color = new Color4();
+        public Color[] faceColors = new Color[6];
+        public Color4 color = new Color4();
 
         // Vectorii normali pentru fiecare față a cubului
         float[,] n = new float[,]
@@ -30,7 +30,7 @@ namespace Lab4
         };
 
         // Indicii vertecșilor pentru fiecare față a cubului
-        int[,] faces = new int[,]
+       public  int[,] faces = new int[,]
         {
             {0, 1, 2, 3},
             {3, 2, 6, 7},
@@ -41,7 +41,7 @@ namespace Lab4
         };
 
         // Lista de vertecși care definesc cubul
-        private List<VertexPoint> vertices;
+        public List<VertexPoint> vertices;
 
         public Cube(int size)
         {
@@ -93,14 +93,7 @@ namespace Lab4
                 {
                     int vertexIndex = faces[i, j];
 
-                    if (i == 4) // Dacă este fața a patra, va fi desenată maro
-                    {
-                        GL.Color4(Color4.Brown);
-                    }
-                    else // Altfel, se va folosi culoarea aleatorie a cubului
-                    {
-                        GL.Color4(color);
-                    }
+                  //  GL.Color4(color);
 
                     GL.Vertex3(vertices[vertexIndex].coordX, vertices[vertexIndex].coordY, vertices[vertexIndex].coordZ);
                 }
