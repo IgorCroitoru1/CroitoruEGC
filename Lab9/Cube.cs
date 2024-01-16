@@ -18,6 +18,15 @@ namespace Lab9
         public Color[] faceColors = new Color[6];
         public Color4 color = new Color4();
 
+
+        float[] texCoords = {
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        1.0f, 1.0f,
+        0.0f, 1.0f
+    };
+
+
         // Vectorii normali pentru fiecare față a cubului
         float[,] n = new float[,]
         {
@@ -60,6 +69,11 @@ namespace Lab9
 
             // Obținerea unei culori aleatorii pentru cub
             color = randomColor.GetRandomColor();
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                vertices[i].texCoordX = texCoords[i % 4 * 2];
+                vertices[i].texCoordY = texCoords[i % 4 * 2 + 1];
+            }
         }
 
         // Metoda care verifică tastatura pentru comenzi
@@ -82,23 +96,46 @@ namespace Lab9
         }
 
         // Metoda care desenează cubul
-        public void Draw()
+        //public void Draw()
+        //{
+        //    GL.Begin(PrimitiveType.Quads);
+        //    for (int i = 0; i < 6; i++)
+        //    {
+        //        //GL.Normal3(n[i, 0], n[i, 1], n[i, 2]);
+
+        //        for (int j = 0; j < 4; j++)
+        //        {
+        //            int vertexIndex = faces[i, j];
+
+        //            GL.Color4(color);
+
+        //            GL.Vertex3(vertices[vertexIndex].coordX, vertices[vertexIndex].coordY, vertices[vertexIndex].coordZ);
+        //        }
+        //    }
+        //    GL.End();
+        //}
+        public void Draw(int textureID)
         {
+            GL.Enable(EnableCap.Texture2D);
+           // GL.BindTexture(TextureTarget.Texture2D, textureID);
+
             GL.Begin(PrimitiveType.Quads);
             for (int i = 0; i < 6; i++)
             {
-                //GL.Normal3(n[i, 0], n[i, 1], n[i, 2]);
-
+                GL.Normal3(n[i, 0], n[i, 1], n[i, 2]);
                 for (int j = 0; j < 4; j++)
                 {
                     int vertexIndex = faces[i, j];
 
-                  //  GL.Color4(color);
-
+                   // GL.Normal3(n[i, 0], n[i, 1], n[i, 2]);
+                    GL.Color4(color);
+                    GL.TexCoord2(vertices[vertexIndex].texCoordX, vertices[vertexIndex].texCoordY);
                     GL.Vertex3(vertices[vertexIndex].coordX, vertices[vertexIndex].coordY, vertices[vertexIndex].coordZ);
                 }
             }
             GL.End();
+
+            GL.Disable(EnableCap.Texture2D);
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Lab9
         public int coordY;
         public int coordZ;
         public Color pointColor;
+        public float texCoordX, texCoordY;
         public VertexPoint()
         {
             coordX = 0;

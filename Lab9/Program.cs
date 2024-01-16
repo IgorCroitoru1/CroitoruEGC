@@ -78,18 +78,24 @@ namespace Lab9
             base.OnLoad(e);
             GL.Enable(EnableCap.DepthTest);
             GL.DepthFunc(DepthFunction.Less);
-          
+
+            //texture
+
+            GL.GenTextures(textures.Length, textures);
+            LoadTexture(textures[0], "C:\\Users\\Igor\\source\\repos\\LaboratoareEGC\\Lab9\\brickTexture.jpg");
+
+
             SetupLight();
-            // Enable lighting
+           // Enable lighting
             GL.Enable(EnableCap.Lighting);
             GL.Enable(EnableCap.Light0);
 
-            // Set light properties
+            //Set light properties
             float[] lightPosition = { 50.0f, 50.0f, 50.0f, 1.0f };
             GL.Light(LightName.Light0, LightParameter.Position, lightPosition);
             GL.Light(LightName.Light0, LightParameter.Ambient, new float[] { 0.4f, 0.4f, 0.4f, 1.0f });
 
-            GL.Light(LightName.Light0, LightParameter.Diffuse, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+            GL.Light(LightName.Light0, LightParameter.Diffuse, new float[] { 6.0f, 6.0f, 6.0f, 1.0f });
             GL.Light(LightName.Light0, LightParameter.Specular, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
             GL.Light(LightName.Light0, LightParameter.Specular, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
 
@@ -103,17 +109,17 @@ namespace Lab9
 
 
         }
-     
 
+       
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
+           // GL.BindTexture(TextureTarget.Texture2D, textures[0]);
             DrawAxes();
-            //cube.Draw();
-            pyramid.Draw();
+            cube.Draw(textures[0]);
+            //pyramid.Draw();
             SwapBuffers();
         }
       
@@ -170,7 +176,24 @@ namespace Lab9
         }
 
 
+        private void LoadTexture(int textureId, string filename)
+        {
+            Bitmap bmp = new Bitmap(filename);
 
+            BitmapData data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height),
+                                                    System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                                                    System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.BindTexture(TextureTarget.Texture2D, textureId);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
+                          bmp.Width, bmp.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra,
+                          PixelType.UnsignedByte, data.Scan0);
+
+            bmp.UnlockBits(data);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (float)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (float)TextureMagFilter.Linear);
+        }
 
 
         static void Main(string[] args)
